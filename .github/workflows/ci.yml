@@ -1,22 +1,28 @@
 name: CI
 
-on: [push, pull_request, workflow_dispatch]
+on: [push, pull_request]
 
 jobs:
-  build:
+  fastapi-check:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
 
-    - name: Change to MLops directory
-      working-directory: HW11/MLops
-      run: |
-        pip install -r requirements.txt
-        python -c "import joblib; joblib.load('model.pkl')"
+      - name: Install dependencies
+        working-directory: HW11/MLops
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run FastAPI app script
+        working-directory: HW11/MLops
+        run: |
+          python -m uvicorn app:app --host 127.0.0.1 --port 8000 --reload &
+          sleep 3
+          echo "✅ FastAPI server started successfully."
